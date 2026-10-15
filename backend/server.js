@@ -32,7 +32,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
-// CORS
+// CORS — harus sebelum rate limiter agar preflight OPTIONS tidak kena limit
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://web-grouporder.vercel.app',
@@ -40,20 +40,24 @@ const allowedOrigins = [
   'http://localhost:3000',
 ].filter(Boolean).map(o => o.replace(/\/$/, ''));
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile, curl, etc.)
+    // Allow requests with no origin (mobile, curl, server-to-server, etc.)
     if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
     console.warn('CORS blocked origin:', origin);
-    return callback(null, false);
+    // Kembalikan error agar browser mendapat respons yang jelas, bukan 502
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+  optionsSuccessStatus: 200,
+};
 
-// Handle OPTIONS preflight explicitly
-app.options('*', cors());
+app.use(cors(corsOptions));
+
+// Tangani preflight OPTIONS secara eksplisit agar tidak kena rate limiter
+app.options('*', cors(corsOptions));
 
 // Rate limiting
 const limiter = rateLimit({
