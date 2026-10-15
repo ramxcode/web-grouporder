@@ -1,4 +1,12 @@
 require('dotenv').config();
+
+// Prevent crash from unhandled errors — log instead
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err.message, err.stack);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED REJECTION:', reason);
+});
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -25,12 +33,27 @@ app.use(helmet({
 }));
 
 // CORS
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://web-grouporder.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+].filter(Boolean).map(o => o.replace(/\/$/, ''));
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn('CORS blocked origin:', origin);
+    return callback(null, false);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// Handle OPTIONS preflight explicitly
+app.options('*', cors());
 
 // Rate limiting
 const limiter = rateLimit({
