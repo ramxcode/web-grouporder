@@ -8,7 +8,6 @@ process.on('unhandledRejection', (reason) => {
   console.error('UNHANDLED REJECTION:', reason);
 });
 const express = require('express');
-const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
@@ -32,29 +31,30 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
-// CORS — harus sebelum rate limiter agar preflight OPTIONS tidak kena limit
-const allowedOrigins = [
+// CORS — manual middleware, lebih reliable dengan Express 5
+const allowedOrigins = new Set([
   process.env.FRONTEND_URL,
   'https://web-grouporder.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
-].filter(Boolean).map(o => o.replace(/\/$/, ''));
+].filter(Boolean).map(o => o.replace(/\/$/, '')));
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile, curl, server-to-server, etc.)
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  // Izinkan jika origin tidak ada (curl/server) atau ada di daftar
+  if (!origin || allowedOrigins.has(origin)) {
+    if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  } else {
     console.warn('CORS blocked origin:', origin);
-    // Kembalikan error agar browser mendapat respons yang jelas, bukan 502
-    return callback(new Error(`Origin ${origin} not allowed by CORS`));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
+  }
+  // Balas preflight OPTIONS langsung
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  next();
+});
 
 // Rate limiting
 const limiter = rateLimit({
