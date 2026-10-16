@@ -57,7 +57,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Tangani preflight OPTIONS secara eksplisit agar tidak kena rate limiter
-app.options('*', cors(corsOptions));
+// Express 5 (path-to-regexp v8) tidak mendukung wildcard '*' — gunakan '/{*path}'
+app.options('/{*path}', cors(corsOptions));
 
 // Rate limiting
 const limiter = rateLimit({
