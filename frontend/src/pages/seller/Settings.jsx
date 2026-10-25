@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { Settings, Save, Plus, Trash2 } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 export default function SellerSettings() {
   const [settings, setSettings] = useState(null);
@@ -132,7 +132,7 @@ export default function SellerSettings() {
               <div className="card-header">
                 <div className="card-title">Rekening Bank</div>
                 <button type="button" className="btn btn-secondary btn-sm" onClick={addRekening}>
-                  <Plus size={13} /> Tambah
+                  <Icon name="Plus" size={13} /> Tambah
                 </button>
               </div>
               <div className="card-body">
@@ -145,7 +145,7 @@ export default function SellerSettings() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                       <span style={{ fontWeight: 600, fontSize: 13 }}>Rekening {i + 1}</span>
                       <button type="button" className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} onClick={() => removeRekening(i)}>
-                        <Trash2 size={13} />
+                        <Icon name="Trash2" size={13} />
                       </button>
                     </div>
                     <div className="form-group" style={{ marginBottom: 8 }}>
@@ -166,7 +166,7 @@ export default function SellerSettings() {
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
           <button type="submit" className="btn btn-primary btn-lg" disabled={saving}>
-            <Save size={16} />
+            <Icon name="Save" size={16} />
             {saving ? 'Menyimpan...' : 'Simpan Pengaturan'}
           </button>
         </div>

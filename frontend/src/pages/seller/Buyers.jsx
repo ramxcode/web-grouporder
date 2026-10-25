@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { ConfirmDialog, SkeletonRows, EmptyState, Pagination } from '../../components/UI';
 import { formatCurrency, formatDate, formatDateShort } from '../../lib/utils';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Search, Trash2, Edit, Users, Eye, X, MessageCircle } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 function BuyerModal({ buyer, onClose, onSave }) {
   const isEdit = !!buyer;
@@ -46,7 +46,7 @@ function BuyerModal({ buyer, onClose, onSave }) {
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">{isEdit ? `Edit Buyer — ${buyer.name}` : 'Tambah Buyer Baru'}</h3>
-          <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={18} /></button>
+          <button className="btn btn-ghost btn-icon" onClick={onClose}><Icon name="X" size={18} /></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -129,7 +129,7 @@ function BuyerDetail({ buyerId, onClose }) {
             <h3 className="modal-title">Detail Buyer</h3>
             {buyer && <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{buyer.name}</span>}
           </div>
-          <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={18} /></button>
+          <button className="btn btn-ghost btn-icon" onClick={onClose}><Icon name="X" size={18} /></button>
         </div>
         <div className="modal-body">
           {loading ? (
@@ -275,13 +275,13 @@ export default function Buyers() {
             {pagination && <div className="card-subtitle">{pagination.total} buyer terdaftar</div>}
           </div>
           <button className="btn btn-primary" onClick={() => { setEditBuyer(null); setShowModal(true); }}>
-            <Plus size={15} /> Tambah Buyer
+            <Icon name="Plus" size={15} /> Tambah Buyer
           </button>
         </div>
 
         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)' }}>
           <div className="search-input-wrap" style={{ maxWidth: 360 }}>
-            <Search size={15} />
+            <Icon name="Search" size={15} />
             <input type="text" className="search-input" placeholder="Cari nama, email, WA..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
           </div>
         </div>
@@ -305,7 +305,7 @@ export default function Buyers() {
             <tbody>
               {loading ? <SkeletonRows rows={6} cols={10} /> : buyers.length === 0 ? (
                 <tr><td colSpan={10}>
-                  <EmptyState icon={<Users size={32} />} title="Belum ada buyer" message="Tambahkan buyer pertama" />
+                  <EmptyState icon={<Icon name="Users" size={32} />} title="Belum ada buyer" message="Tambahkan buyer pertama" />
                 </td></tr>
               ) : buyers.map(b => (
                 <tr key={b._id}>
@@ -320,7 +320,7 @@ export default function Buyers() {
                   <td>
                     {b.whatsapp ? (
                       <a href={`https://wa.me/${b.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" style={{ color: 'var(--success)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <MessageCircle size={13} />{b.whatsapp}
+                        <Icon name="MessageCircle" size={13} />{b.whatsapp}
                       </a>
                     ) : <span style={{ color: 'var(--text-muted)' }}>-</span>}
                   </td>
@@ -333,9 +333,9 @@ export default function Buyers() {
                   <td style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDateShort(b.createdAt)}</td>
                   <td>
                     <div className="table-actions">
-                      <button className="btn btn-ghost btn-icon btn-sm" title="Detail" onClick={() => setViewBuyer(b._id)}><Eye size={14} /></button>
-                      <button className="btn btn-ghost btn-icon btn-sm" title="Edit" onClick={() => { setEditBuyer(b); setShowModal(true); }}><Edit size={14} /></button>
-                      <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} title="Hapus" onClick={() => setDeleteConfirm(b)}><Trash2 size={14} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" title="Detail" onClick={() => setViewBuyer(b._id)}><Icon name="Eye" size={14} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" title="Edit" onClick={() => { setEditBuyer(b); setShowModal(true); }}><Icon name="Edit" size={14} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} title="Hapus" onClick={() => setDeleteConfirm(b)}><Icon name="Trash2" size={14} /></button>
                     </div>
                   </td>
                 </tr>

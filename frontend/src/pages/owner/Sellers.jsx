@@ -258,15 +258,15 @@ export default function SellerManagement() {
                   <td><StatusBadge status={s.status} /></td>
                   <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{s.user?.lastLogin ? formatDate(s.user.lastLogin) : 'Belum login'}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                      <button className="btn btn-sm btn-secondary" onClick={() => navigate(`/owner/sellers/${s._id}`)}>Detail</button>
-                      <button className="btn btn-sm btn-secondary" onClick={() => openEdit(s)}>Edit</button>
+                    <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'nowrap', alignItems: 'center' }}>
+                      <button className="btn btn-sm btn-secondary" style={{ padding: '4px 8px', fontSize: '0.75rem', whiteSpace: 'nowrap' }} onClick={() => navigate(`/owner/sellers/${s._id}`)}>Detail</button>
+                      <button className="btn btn-sm btn-secondary" style={{ padding: '4px 8px', fontSize: '0.75rem', whiteSpace: 'nowrap' }} onClick={() => openEdit(s)}>Edit</button>
                       {s.status === 'active'
-                        ? <button className="btn btn-sm" style={{ background: '#fef3c7', color: '#92400e' }} onClick={() => handleStatusChange(s, 'suspend', 'suspend')}>Suspend</button>
-                        : <button className="btn btn-sm" style={{ background: '#d1fae5', color: '#065f46' }} onClick={() => handleStatusChange(s, 'activate', 'aktifkan')}>Aktifkan</button>
+                        ? <button className="btn btn-sm" style={{ background: '#fef3c7', color: '#92400e', padding: '4px 8px', fontSize: '0.75rem', whiteSpace: 'nowrap' }} onClick={() => handleStatusChange(s, 'suspend', 'suspend')}>Suspend</button>
+                        : <button className="btn btn-sm" style={{ background: '#d1fae5', color: '#065f46', padding: '4px 8px', fontSize: '0.75rem', whiteSpace: 'nowrap' }} onClick={() => handleStatusChange(s, 'activate', 'aktifkan')}>Aktifkan</button>
                       }
-                      <button className="btn btn-sm btn-secondary" onClick={() => { setShowResetPwd(s); setNewPassword(''); }}>Reset PWD</button>
-                      <button className="btn btn-sm btn-danger" onClick={() => handleDelete(s)}>Hapus</button>
+                      <button className="btn btn-sm btn-secondary" style={{ padding: '4px 8px', fontSize: '0.75rem', whiteSpace: 'nowrap' }} onClick={() => { setShowResetPwd(s); setNewPassword(''); }}>Reset PWD</button>
+                      <button className="btn btn-sm btn-danger" style={{ padding: '4px 8px', fontSize: '0.75rem', whiteSpace: 'nowrap' }} onClick={() => handleDelete(s)}>Hapus</button>
                     </div>
                   </td>
                 </tr>

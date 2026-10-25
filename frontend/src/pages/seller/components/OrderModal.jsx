@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../../lib/api';
 import toast from 'react-hot-toast';
 import { formatCurrency, STATUS_ORDER, WAREHOUSES, PAYMENT_METHODS } from '../../../lib/utils';
-import { X } from 'lucide-react';
+import Icon from '../../../components/Icon';
 
 export default function OrderModal({ order, buyers, onClose, onSave }) {
   const isEdit = !!order;
@@ -24,9 +24,12 @@ export default function OrderModal({ order, buyers, onClose, onSave }) {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [stocks, setStocks] = useState([]);
+  const [isManualItem, setIsManualItem] = useState(false);
 
   useEffect(() => {
     if (order) {
+      setIsManualItem(true); // edit mode: always manual
       setForm({
         buyer: order.buyer?._id || order.buyer || '',
         item: order.item || '',
@@ -45,6 +48,17 @@ export default function OrderModal({ order, buyers, onClose, onSave }) {
       });
     }
   }, [order]);
+
+  // Load stocks when buyer is selected (only on add mode)
+  useEffect(() => {
+    if (form.buyer && !isEdit) {
+      api.get(`/stocks?buyerId=${form.buyer}&limit=100`)
+        .then(r => { if (r.data.success) setStocks(r.data.data); })
+        .catch(() => setStocks([]));
+    } else {
+      setStocks([]);
+    }
+  }, [form.buyer, isEdit]);
 
   const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErrors(e => ({ ...e, [k]: '' })); };
 
@@ -100,7 +114,7 @@ export default function OrderModal({ order, buyers, onClose, onSave }) {
       <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">{isEdit ? `Edit Order — ${order.orderId}` : 'Tambah Order Baru'}</h3>
-          <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={18} /></button>
+          <button className="btn btn-ghost btn-icon" onClick={onClose}><Icon name="X" size={18} /></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -116,8 +130,49 @@ export default function OrderModal({ order, buyers, onClose, onSave }) {
               </div>
               {/* Item */}
               <div className="form-group">
-                <label className="form-label required">Nama Barang / Item</label>
-                <input className={`form-control ${errors.item ? 'error' : ''}`} value={form.item} onChange={e => set('item', e.target.value)} placeholder="Nama barang" />
+                <label className="form-label required" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>Nama Barang / Item</span>
+                  {!isEdit && (
+                    <button
+                      type="button"
+                      style={{ fontSize: 11, color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontWeight: 600 }}
+                      onClick={() => { setIsManualItem(v => !v); set('item', ''); }}
+                    >
+                      {isManualItem ? '← Pilih dari stok' : 'Ketik manual'}
+                    </button>
+                  )}
+                </label>
+                {!isEdit && !isManualItem ? (
+                  <select
+                    className={`form-control ${errors.item ? 'error' : ''}`}
+                    value={form.item}
+                    onChange={e => {
+                      const selected = stocks.find(s => s.namaBarang === e.target.value);
+                      set('item', e.target.value);
+                      if (selected) {
+                        set('hargaJual', selected.harga || '');
+                        if (selected.warehouse) set('warehouse', selected.warehouse);
+                      }
+                    }}
+                  >
+                    <option value="">-- Pilih barang dari stok --</option>
+                    {stocks.length === 0 && form.buyer && (
+                      <option disabled value="">Tidak ada stok untuk buyer ini</option>
+                    )}
+                    {stocks.map(s => (
+                      <option key={s._id} value={s.namaBarang}>
+                        {s.namaBarang}{s.variant ? ` (${s.variant})` : ''} — Qty: {s.quantity} — {formatCurrency(s.harga)}/pcs
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    className={`form-control ${errors.item ? 'error' : ''}`}
+                    value={form.item}
+                    onChange={e => set('item', e.target.value)}
+                    placeholder="Nama barang"
+                  />
+                )}
                 {errors.item && <div className="form-error">{errors.item}</div>}
               </div>
             </div>

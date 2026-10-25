@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { SkeletonRows, EmptyState, Pagination } from '../../components/UI';
 import { formatDate } from '../../lib/utils';
 import api from '../../lib/api';
-import { Bell, Check, Trash2 } from 'lucide-react';
+import Icon from '../../components/Icon';
 import toast from 'react-hot-toast';
 
 const TYPE_COLORS = {
@@ -84,7 +84,7 @@ export default function Notifications() {
             </label>
             {unreadCount > 0 && (
               <button className="btn btn-secondary btn-sm" onClick={markAllRead}>
-                <Check size={14} /> Tandai Semua Dibaca
+                <Icon name="Check" size={14} /> Tandai Semua Dibaca
               </button>
             )}
           </div>
@@ -104,7 +104,7 @@ export default function Notifications() {
               ))}
             </div>
           ) : notifications.length === 0 ? (
-            <EmptyState icon={<Bell size={32} />} title="Tidak ada notifikasi" message={unreadOnly ? 'Semua notifikasi sudah dibaca' : 'Belum ada notifikasi'} />
+            <EmptyState icon={<Icon name="Bell" size={32} />} title="Tidak ada notifikasi" message={unreadOnly ? 'Semua notifikasi sudah dibaca' : 'Belum ada notifikasi'} />
           ) : (
             notifications.map(n => {
               const style = TYPE_COLORS[n.type] || TYPE_COLORS.general;
@@ -141,7 +141,7 @@ export default function Notifications() {
                     onClick={e => { e.stopPropagation(); deleteNotif(n._id); }}
                     title="Hapus"
                   >
-                    <Trash2 size={13} />
+                    <Icon name="Trash2" size={13} />
                   </button>
                 </div>
               );

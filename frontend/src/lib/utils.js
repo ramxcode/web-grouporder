@@ -54,6 +54,9 @@ export const getStatusBadgeClass = (status) => {
     'Arrived INA': 'status-arrived-ina',
     'Arrived Admin': 'status-arrived-admin',
     'Done CO': 'status-done-co',
+    'Packing': 'status-packing',
+    'Shipping INA': 'status-shipping-ina',
+    'Selesai': 'status-selesai',
     // Payment
     'Unpaid': 'status-unpaid',
     'DP': 'status-dp',
@@ -83,6 +86,9 @@ export const STATUS_ORDER = [
   'Arrived INA',
   'Arrived Admin',
   'Done CO',
+  'Packing',
+  'Shipping INA',
+  'Selesai',
 ];
 
 export const PAYMENT_STATUSES = ['Unpaid', 'DP', 'Paid'];

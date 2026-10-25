@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { SkeletonRows, EmptyState, Pagination } from '../../components/UI';
 import { formatDate, formatDateShort } from '../../lib/utils';
 import api from '../../lib/api';
-import { FileText, Search } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 const ACTION_COLORS = {
   CREATE: 'badge-success',
@@ -42,7 +42,7 @@ export default function AuditLog() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)' }}>
           <div className="filter-bar" style={{ marginBottom: 0 }}>
             <div className="search-input-wrap">
-              <Search size={15} />
+              <Icon name="Search" size={15} />
               <input type="text" className="search-input" placeholder="Cari aktivitas..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
             </div>
             <select className="filter-select" value={filterEntity} onChange={e => { setFilterEntity(e.target.value); setPage(1); }}>
@@ -56,7 +56,7 @@ export default function AuditLog() {
           {loading ? (
             <div style={{ padding: 16 }}><SkeletonRows rows={8} cols={5} /></div>
           ) : logs.length === 0 ? (
-            <EmptyState icon={<FileText size={32} />} title="Belum ada aktivitas" message="Log aktivitas akan muncul di sini" />
+            <EmptyState icon={<Icon name="FileText" size={32} />} title="Belum ada aktivitas" message="Log aktivitas akan muncul di sini" />
           ) : logs.map(log => (
             <div key={log._id} style={{
               padding: '14px 24px', borderBottom: '1px solid var(--border-light)',

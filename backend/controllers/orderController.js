@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const Buyer = require('../models/Buyer');
+const Stock = require('../models/Stock');
 const { generateOrderId, updateBuyerSummary } = require('../utils/helpers');
 const createAuditLog = require('../utils/auditLogger');
 const createNotification = require('../utils/notificationHelper');
@@ -177,6 +178,24 @@ const createOrder = async (req, res) => {
     });
 
     await updateBuyerSummary(buyerId);
+
+    // Auto-reduce matching stock quantity
+    const orderedQty = order.quantity || 1;
+    const matchingStocks = await Stock.find({
+      seller: req.user._id,
+      buyer: buyerId,
+      namaBarang: { $regex: new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') },
+      quantity: { $gt: 0 },
+    }).sort({ createdAt: 1 });
+
+    let remainingToReduce = orderedQty;
+    for (const stk of matchingStocks) {
+      if (remainingToReduce <= 0) break;
+      const reduce = Math.min(stk.quantity, remainingToReduce);
+      stk.quantity -= reduce;
+      remainingToReduce -= reduce;
+      await stk.save();
+    }
 
     await createAuditLog({
       action: 'CREATE',

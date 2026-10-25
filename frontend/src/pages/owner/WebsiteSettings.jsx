@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import api from '../../lib/api';
 import { formatCurrency, formatDate } from '../../lib/utils';
+import { useAuth } from '../../contexts/AuthContext';
 
 const TABS = [
   { key: 'brand', label: '🎨 Branding' },
@@ -25,6 +26,7 @@ const Toggle = ({ checked, onChange, label }) => (
 );
 
 export default function WebsiteSettings() {
+  const { refreshSettings, applyWebsiteSettingsToDOM } = useAuth();
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -46,7 +48,15 @@ export default function WebsiteSettings() {
 
   useEffect(() => { load(); }, [load]);
 
-  const updateField = (field, value) => setSettings(s => ({ ...s, [field]: value }));
+
+  const updateField = (field, value) => {
+    setSettings(s => {
+      const updated = { ...s, [field]: value };
+      // Apply to DOM immediately for realtime preview (colors, etc)
+      applyWebsiteSettingsToDOM(updated);
+      return updated;
+    });
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -54,6 +64,8 @@ export default function WebsiteSettings() {
       const payload = { ...settings };
       delete payload._id; delete payload.__v; delete payload.createdAt; delete payload.updatedAt;
       await api.put('/owner/website-settings', payload);
+      // Re-load settings from DB and apply globally (title, colors, favicon)
+      await refreshSettings();
       showToast('Settings berhasil disimpan ✓');
     } catch { showToast('Gagal menyimpan', 'error'); }
     finally { setSaving(false); setConfirm(false); }
@@ -146,8 +158,18 @@ export default function WebsiteSettings() {
               <label className="form-label">Favicon URL</label>
               <input className="form-input" value={settings.favicon || ''} onChange={e => updateField('favicon', e.target.value)} />
             </div>
+            {/* Developer / Footer link settings */}
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label className="form-label">Developer Name (tampil di footer)</label>
+              <input className="form-input" value={settings.developerName || ''} onChange={e => updateField('developerName', e.target.value)} placeholder="Contoh: RAMXCODE" />
+            </div>
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label className="form-label">Developer Link (URL di footer)</label>
+              <input className="form-input" value={settings.developerLink || ''} onChange={e => updateField('developerLink', e.target.value)} placeholder="Contoh: https://t.me/minramz" />
+            </div>
           </div>
         )}
+
 
         {/* --- THEME --- */}
         {activeTab === 'theme' && (

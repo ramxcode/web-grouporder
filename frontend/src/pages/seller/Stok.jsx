@@ -4,12 +4,12 @@ import { StockBadge, ConfirmDialog, SkeletonRows, EmptyState, Pagination } from 
 import { formatCurrency, formatDateShort, WAREHOUSES } from '../../lib/utils';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Search, Trash2, Edit, Package, X, Minus } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 function StockModal({ stock, buyers, onClose, onSave }) {
   const isEdit = !!stock;
   const [form, setForm] = useState({
-    namaBarang: '', variant: '', quantity: 1, harga: '', buyerId: '',
+    namaBarang: '', variant: '', quantity: 1, harga: '',
     warehouse: '', status: 'Waiting Arrival', notes: '', tanggalMasuk: '',
   });
   const [foto, setFoto] = useState(null);
@@ -23,7 +23,6 @@ function StockModal({ stock, buyers, onClose, onSave }) {
         variant: stock.variant || '',
         quantity: stock.quantity || 1,
         harga: stock.harga || '',
-        buyerId: stock.buyer?._id || stock.buyer || '',
         warehouse: stock.warehouse || '',
         status: stock.status || 'Waiting Arrival',
         notes: stock.notes || '',
@@ -70,7 +69,7 @@ function StockModal({ stock, buyers, onClose, onSave }) {
       <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">{isEdit ? 'Edit Stok' : 'Tambah Stok'}</h3>
-          <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={18} /></button>
+          <button className="btn btn-ghost btn-icon" onClick={onClose}><Icon name="X" size={18} /></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -114,13 +113,6 @@ function StockModal({ stock, buyers, onClose, onSave }) {
             </div>
 
             <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Pemilik (Buyer)</label>
-                <select className="form-control" value={form.buyerId} onChange={e => setForm(f => ({ ...f, buyerId: e.target.value }))}>
-                  <option value="">Tanpa pemilik</option>
-                  {buyers.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
-                </select>
-              </div>
               <div className="form-group">
                 <label className="form-label">Warehouse</label>
                 <select className="form-control" value={form.warehouse} onChange={e => setForm(f => ({ ...f, warehouse: e.target.value }))}>
@@ -223,7 +215,7 @@ export default function SellerStok() {
         <div className="card-header">
           <div className="card-title">Daftar Stok</div>
           <button className="btn btn-primary" onClick={() => { setEditStock(null); setShowModal(true); }}>
-            <Plus size={15} /> Tambah Stok
+            <Icon name="Plus" size={15} /> Tambah Stok
           </button>
         </div>
 
@@ -231,13 +223,9 @@ export default function SellerStok() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)' }}>
           <div className="filter-bar" style={{ marginBottom: 0 }}>
             <div className="search-input-wrap">
-              <Search size={15} />
+              <Icon name="Search" size={15} />
               <input type="text" className="search-input" placeholder="Cari nama barang, variant..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
             </div>
-            <select className="filter-select" value={filterBuyer} onChange={e => { setFilterBuyer(e.target.value); setPage(1); }}>
-              <option value="">Semua Pemilik</option>
-              {buyers.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
-            </select>
             <select className="filter-select" value={filterWarehouse} onChange={e => { setFilterWarehouse(e.target.value); setPage(1); }}>
               <option value="">Semua Warehouse</option>
               {WAREHOUSES.map(w => <option key={w} value={w}>{w}</option>)}
@@ -258,8 +246,8 @@ export default function SellerStok() {
                 <th>Nama Barang</th>
                 <th>Variant</th>
                 <th>Qty</th>
-                <th>Harga</th>
-                <th>Pemilik</th>
+                <th>Harga/pcs</th>
+                <th>Total Harga</th>
                 <th>Warehouse</th>
                 <th>Status</th>
                 <th>Aksi</th>
@@ -268,7 +256,7 @@ export default function SellerStok() {
             <tbody>
               {loading ? <SkeletonRows rows={6} cols={9} /> : stocks.length === 0 ? (
                 <tr><td colSpan={9}>
-                  <EmptyState icon={<Package size={32} />} title="Belum ada stok" message="Tambahkan barang ke inventori" />
+                  <EmptyState icon={<Icon name="Package" size={32} />} title="Belum ada stok" message="Tambahkan barang ke inventori" />
                 </td></tr>
               ) : stocks.map(s => (
                 <tr key={s._id}>
@@ -277,7 +265,7 @@ export default function SellerStok() {
                       <img src={s.foto} alt={s.namaBarang} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }} />
                     ) : (
                       <div style={{ width: 48, height: 48, background: 'var(--bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Package size={20} style={{ color: 'var(--text-muted)' }} />
+                        <Icon name="Package" size={20} style={{ color: 'var(--text-muted)' }} />
                       </div>
                     )}
                   </td>
@@ -292,18 +280,24 @@ export default function SellerStok() {
                         onClick={() => { setQtyModal(s); setQtyType('add'); setQtyAmount(''); }}
                         title="Atur quantity"
                       >
-                        <Plus size={12} />
+                        <Icon name="Plus" size={12} />
                       </button>
                     </div>
                   </td>
-                  <td style={{ fontWeight: 600, fontSize: 13 }}>{formatCurrency(s.harga)}</td>
-                  <td style={{ fontSize: 13 }}>{s.buyer?.name || <span style={{ color: 'var(--text-muted)' }}>-</span>}</td>
+                  <td>
+                    <div style={{ fontSize: 12.5 }}
+                    >{formatCurrency(s.harga)}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>/pcs</div>
+                  </td>
+                  <td style={{ fontWeight: 700, fontSize: 13, color: 'var(--primary)' }}>
+                    {formatCurrency((s.harga || 0) * (s.quantity || 0))}
+                  </td>
                   <td>{s.warehouse ? <span className="badge badge-info">{s.warehouse}</span> : <span style={{ color: 'var(--text-muted)' }}>-</span>}</td>
                   <td><StockBadge status={s.status} /></td>
                   <td>
                     <div className="table-actions">
-                      <button className="btn btn-ghost btn-icon btn-sm" title="Edit" onClick={() => { setEditStock(s); setShowModal(true); }}><Edit size={14} /></button>
-                      <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} title="Hapus" onClick={() => setDeleteConfirm(s)}><Trash2 size={14} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" title="Edit" onClick={() => { setEditStock(s); setShowModal(true); }}><Icon name="Edit" size={14} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} title="Hapus" onClick={() => setDeleteConfirm(s)}><Icon name="Trash2" size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -325,7 +319,7 @@ export default function SellerStok() {
           <div className="modal modal-sm" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">Atur Quantity — {qtyModal.namaBarang}</h3>
-              <button className="btn btn-ghost btn-icon" onClick={() => setQtyModal(null)}><X size={18} /></button>
+              <button className="btn btn-ghost btn-icon" onClick={() => setQtyModal(null)}><Icon name="X" size={18} /></button>
             </div>
             <div className="modal-body">
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>
@@ -333,10 +327,10 @@ export default function SellerStok() {
               </p>
               <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                 <button className={`btn flex-1 ${qtyType === 'add' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setQtyType('add')}>
-                  <Plus size={14} /> Tambah
+                  <Icon name="Plus" size={14} /> Tambah
                 </button>
                 <button className={`btn flex-1 ${qtyType === 'subtract' ? 'btn-danger' : 'btn-secondary'}`} onClick={() => setQtyType('subtract')}>
-                  <Minus size={14} /> Kurangi
+                  <Icon name="Minus" size={14} /> Kurangi
                 </button>
               </div>
               <input type="number" className="form-control" value={qtyAmount} onChange={e => setQtyAmount(e.target.value)} placeholder="Jumlah" min={1} autoFocus />

@@ -9,7 +9,9 @@ const websiteSettingsSchema = new mongoose.Schema({
   logo: { type: String, default: null },
   logoDark: { type: String, default: null },
   favicon: { type: String, default: null },
-  footerText: { type: String, default: '© 2026 WEB REKAPAN GO. All rights reserved.' },
+  footerText: { type: String, default: '© 2026 Zastiply - Made By RAMXCODE' },
+  developerLink: { type: String, default: 'https://t.me/minramz' },
+  developerName: { type: String, default: 'RAMXCODE' },
 
   // Theme
   primaryColor: { type: String, default: '#6366f1' },

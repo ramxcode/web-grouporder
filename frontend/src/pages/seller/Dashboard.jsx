@@ -1,12 +1,9 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { StatCard } from '../../components/UI';
 import { formatCurrency, formatDateShort, getStatusBadgeClass, getPaymentBadgeClass } from '../../lib/utils';
 import api from '../../lib/api';
-import {
-  ShoppingBag, Users, Package, TrendingUp, CreditCard, DollarSign,
-  AlertCircle, CheckCircle, Layers, BarChart3,
-} from 'lucide-react';
+import Icon from '../../components/Icon';
 
 const STATUS_COLORS = {
   'Ordered': '#0369a1',
@@ -73,16 +70,16 @@ export default function SellerDashboard() {
     <Layout title="Dashboard" subtitle="Overview semua aktivitas Group Order">
       {/* Summary Stats */}
       <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))' }}>
-        <StatCard label="Total Order" value={s.totalOrder || 0} icon={<ShoppingBag size={22} />} color="var(--primary)" bg="var(--primary-bg)" />
-        <StatCard label="Total Buyer" value={s.totalBuyer || 0} icon={<Users size={22} />} color="#8b5cf6" bg="#f5f3ff" />
-        <StatCard label="Total Barang" value={s.totalBarang || 0} icon={<Package size={22} />} color="#0ea5e9" bg="#f0f9ff" />
-        <StatCard label="Total Stok" value={s.totalStok || 0} icon={<Layers size={22} />} color="#14b8a6" bg="#f0fdfa" />
-        <StatCard label="Total Tagihan" value={formatCurrency(s.totalTagihan)} icon={<CreditCard size={22} />} color="#f59e0b" bg="#fef3c7" />
-        <StatCard label="Total DP Masuk" value={formatCurrency(s.totalDP)} icon={<DollarSign size={22} />} color="#10b981" bg="#d1fae5" />
-        <StatCard label="Total Pelunasan" value={formatCurrency(s.totalPelunasan)} icon={<CheckCircle size={22} />} color="#22c55e" bg="#f0fdf4" />
-        <StatCard label="Belum Dibayar" value={formatCurrency(s.totalBelumDibayar)} icon={<AlertCircle size={22} />} color="#ef4444" bg="#fee2e2" />
-        <StatCard label="Order Selesai" value={s.totalOrderSelesai || 0} icon={<CheckCircle size={22} />} color="#15803d" bg="#dcfce7" />
-        <StatCard label="Total Profit" value={formatCurrency(s.totalProfit)} icon={<TrendingUp size={22} />} color="#7c3aed" bg="#f5f3ff" />
+        <StatCard label="Total Order" value={s.totalOrder || 0} icon={<Icon name="ShoppingBag" size={22} />} color="var(--primary)" bg="var(--primary-bg)" />
+        <StatCard label="Total Buyer" value={s.totalBuyer || 0} icon={<Icon name="Users" size={22} />} color="#8b5cf6" bg="#f5f3ff" />
+        <StatCard label="Total Barang" value={s.totalBarang || 0} icon={<Icon name="Package" size={22} />} color="#0ea5e9" bg="#f0f9ff" />
+        <StatCard label="Total Stok" value={s.totalStok || 0} icon={<Icon name="Layers" size={22} />} color="#14b8a6" bg="#f0fdfa" />
+        <StatCard label="Total Tagihan" value={formatCurrency(s.totalTagihan)} icon={<Icon name="CreditCard" size={22} />} color="#f59e0b" bg="#fef3c7" />
+        <StatCard label="Total DP Masuk" value={formatCurrency(s.totalDP)} icon={<Icon name="DollarSign" size={22} />} color="#10b981" bg="#d1fae5" />
+        <StatCard label="Total Pelunasan" value={formatCurrency(s.totalPelunasan)} icon={<Icon name="CheckCircle" size={22} />} color="#22c55e" bg="#f0fdf4" />
+        <StatCard label="Belum Dibayar" value={formatCurrency(s.totalBelumDibayar)} icon={<Icon name="AlertCircle" size={22} />} color="#ef4444" bg="#fee2e2" />
+        <StatCard label="Order Selesai" value={s.totalOrderSelesai || 0} icon={<Icon name="CheckCircle" size={22} />} color="#15803d" bg="#dcfce7" />
+        <StatCard label="Total Profit" value={formatCurrency(s.totalProfit)} icon={<Icon name="TrendingUp" size={22} />} color="#7c3aed" bg="#f5f3ff" />
       </div>
 
       {/* Status Distribution */}

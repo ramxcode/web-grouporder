@@ -4,7 +4,7 @@ import { StatusBadge, PaymentBadge, ConfirmDialog, SkeletonRows, EmptyState, Pag
 import { formatCurrency, formatDateShort, STATUS_ORDER, WAREHOUSES, PAYMENT_STATUSES, PAYMENT_METHODS } from '../../lib/utils';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Search, Filter, Edit, Trash2, Eye, ChevronUp, ChevronDown, Check } from 'lucide-react';
+import Icon from '../../components/Icon';
 import OrderModal from './components/OrderModal';
 import OrderDetail from './components/OrderDetail';
 
@@ -20,6 +20,8 @@ export default function StatusOrder() {
   const [filterPayment, setFilterPayment] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterWarehouse, setFilterWarehouse] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
   const [page, setPage] = useState(1);
 
@@ -43,6 +45,8 @@ export default function StatusOrder() {
         ...(filterPayment && { paymentStatus: filterPayment }),
         ...(filterStatus && { statusBarang: filterStatus }),
         ...(filterWarehouse && { warehouse: filterWarehouse }),
+        ...(startDate && { startDate }),
+        ...(endDate && { endDate }),
       });
       const res = await api.get(`/orders?${params}`);
       if (res.data.success) {
@@ -54,7 +58,7 @@ export default function StatusOrder() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, filterBuyer, filterPayment, filterStatus, filterWarehouse, sortOrder]);
+  }, [page, search, filterBuyer, filterPayment, filterStatus, filterWarehouse, startDate, endDate, sortOrder]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
   useEffect(() => {
@@ -93,9 +97,9 @@ export default function StatusOrder() {
   const toggleAll = () => setSelected(selected.length === orders.length ? [] : orders.map(o => o._id));
 
   const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
-  const clearFilters = () => { setSearch(''); setFilterBuyer(''); setFilterPayment(''); setFilterStatus(''); setFilterWarehouse(''); setPage(1); };
+  const clearFilters = () => { setSearch(''); setFilterBuyer(''); setFilterPayment(''); setFilterStatus(''); setFilterWarehouse(''); setStartDate(''); setEndDate(''); setPage(1); };
 
-  const hasFilters = search || filterBuyer || filterPayment || filterStatus || filterWarehouse;
+  const hasFilters = search || filterBuyer || filterPayment || filterStatus || filterWarehouse || startDate || endDate;
 
   return (
     <Layout title="Status Order" subtitle="Kelola seluruh order dan status pembayaran">
@@ -119,7 +123,7 @@ export default function StatusOrder() {
             {STATUS_ORDER.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
           <button className="btn btn-primary btn-sm" onClick={handleBulkUpdate}>
-            <Check size={14} /> Terapkan
+            <Icon name="Check" size={14} /> Terapkan
           </button>
           <button className="btn btn-secondary btn-sm" onClick={() => setSelected([])}>Batal</button>
         </div>
@@ -133,7 +137,7 @@ export default function StatusOrder() {
             {pagination && <div className="card-subtitle">{pagination.total} total order</div>}
           </div>
           <button className="btn btn-primary" onClick={() => { setEditOrder(null); setShowModal(true); }}>
-            <Plus size={15} /> Tambah Order
+            <Icon name="Plus" size={15} /> Tambah Order
           </button>
         </div>
 
@@ -141,7 +145,7 @@ export default function StatusOrder() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)' }}>
           <div className="filter-bar" style={{ marginBottom: 0 }}>
             <div className="search-input-wrap">
-              <Search size={15} />
+              <Icon name="Search" size={15} />
               <input
                 type="text"
                 className="search-input"
@@ -166,12 +170,14 @@ export default function StatusOrder() {
               <option value="">Semua Warehouse</option>
               {WAREHOUSES.map(w => <option key={w} value={w}>{w}</option>)}
             </select>
+            <input type="date" className="filter-select" value={startDate} onChange={e => { setStartDate(e.target.value); setPage(1); }} title="Dari tanggal" />
+            <input type="date" className="filter-select" value={endDate} onChange={e => { setEndDate(e.target.value); setPage(1); }} title="Sampai tanggal" />
             <button
               className="btn btn-secondary btn-sm"
               onClick={() => setSortOrder(v => v === 'desc' ? 'asc' : 'desc')}
               title="Toggle sort"
             >
-              {sortOrder === 'desc' ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+              {sortOrder === 'desc' ? <Icon name="ChevronDown" size={14} /> : <Icon name="ChevronUp" size={14} />}
               Tanggal
             </button>
             {hasFilters && (
@@ -214,12 +220,12 @@ export default function StatusOrder() {
                 <tr>
                   <td colSpan={12}>
                     <EmptyState
-                      icon={<Search size={32} />}
+                      icon={<Icon name="Search" size={32} />}
                       title="Tidak ada order"
                       message={hasFilters ? "Coba ubah filter pencarian" : "Belum ada order yang dibuat"}
                       action={
                         <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>
-                          <Plus size={14} /> Tambah Order Pertama
+                          <Icon name="Plus" size={14} /> Tambah Order Pertama
                         </button>
                       }
                     />
@@ -257,13 +263,13 @@ export default function StatusOrder() {
                     <td>
                       <div className="table-actions">
                         <button className="btn btn-ghost btn-icon btn-sm" title="Detail" onClick={() => setDetailOrder(o)}>
-                          <Eye size={14} />
+                          <Icon name="Eye" size={14} />
                         </button>
                         <button className="btn btn-ghost btn-icon btn-sm" title="Edit" onClick={() => { setEditOrder(o); setShowModal(true); }}>
-                          <Edit size={14} />
+                          <Icon name="Edit" size={14} />
                         </button>
                         <button className="btn btn-ghost btn-icon btn-sm" title="Hapus" style={{ color: 'var(--danger)' }} onClick={() => setDeleteConfirm(o)}>
-                          <Trash2 size={14} />
+                          <Icon name="Trash2" size={14} />
                         </button>
                       </div>
                     </td>

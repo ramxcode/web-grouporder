@@ -2,35 +2,70 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, ShoppingBag } from 'lucide-react';
+import Icon from '../components/Icon';
+import Footer from '../components/Footer';
+import logoSvg from '../assets/logo.svg';
 
+/**
+ * Login Page — dua tahap:
+ * 1. Pilih peran: Admin/Seller ATAU Buyer
+ * 2. Masukkan kredensial (divalidasi sesuai peran)
+ */
 export default function LoginPage() {
+  // Step 1: pilih role | Step 2: form
+  const [step, setStep]           = useState('choose'); // 'choose' | 'form'
+  const [loginAs, setLoginAs]     = useState('');       // 'admin' | 'buyer'
   const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState('seller');
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [password, setPassword]   = useState('');
+  const [showPass, setShowPass]   = useState(false);
+  const [loading, setLoading]     = useState(false);
 
+  const { login } = useAuth();
+  const navigate  = useNavigate();
+
+  /* ───── Pilih peran ───── */
+  const selectRole = (role) => {
+    setLoginAs(role);
+    setIdentifier('');
+    setPassword('');
+    setStep('form');
+  };
+
+  /* ───── Submit form ───── */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!identifier || !password) {
-      toast.error('Email/WhatsApp dan password wajib diisi');
+      toast.error('Semua kolom wajib diisi');
       return;
     }
     setLoading(true);
     try {
       const data = await login(identifier, password);
-      if (data.success) {
-        toast.success(`Selamat datang, ${data.user.name}!`);
-        if (data.user.role === 'super_admin' || data.user.role === 'owner') {
-          navigate('/owner/dashboard');
-        } else if (data.user.role === 'seller') {
-          navigate('/seller/dashboard');
-        } else {
-          navigate('/buyer/dashboard');
-        }
+      if (!data.success) { toast.error('Login gagal'); return; }
+
+      const role = data.user.role;
+      const isAdminRole = role === 'super_admin' || role === 'owner' || role === 'seller';
+      const isBuyerRole = role === 'buyer';
+
+      /* Validasi: admin login tapi masuk sebagai buyer → tolak */
+      if (loginAs === 'buyer' && isAdminRole) {
+        toast.error('Akun ini bukan akun Buyer. Silakan login sebagai Admin / Seller.');
+        return;
+      }
+
+      /* Validasi: buyer login tapi pilih admin → tolak */
+      if (loginAs === 'admin' && isBuyerRole) {
+        toast.error('Akun ini bukan akun Admin. Silakan login sebagai Buyer.');
+        return;
+      }
+
+      toast.success(`Selamat datang, ${data.user.name}!`);
+      if (role === 'super_admin' || role === 'owner') {
+        navigate('/owner/dashboard');
+      } else if (role === 'seller') {
+        navigate('/seller/dashboard');
+      } else {
+        navigate('/buyer/dashboard');
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Login gagal. Periksa kembali identitas Anda.';
@@ -40,47 +75,97 @@ export default function LoginPage() {
     }
   };
 
+  /* ═══════════════════════════════════════
+     STEP 1 — Pilih peran
+  ═══════════════════════════════════════ */
+  if (step === 'choose') {
+    return (
+      <div className="login-page">
+        <div className="login-card login-choose-card">
+          {/* Logo */}
+          <div className="login-logo">
+            <img src={logoSvg} alt="Zastiply" className="login-brand-logo" />
+          </div>
+
+          <h2 className="login-choose-title">Masuk sebagai</h2>
+
+          {/* Tombol pilih peran */}
+          <div className="login-choose-btns">
+            <button
+              className="login-choose-btn"
+              onClick={() => selectRole('admin')}
+            >
+              <span className="login-choose-icon-shape admin-shape" />
+              <span>Admin / Seller</span>
+            </button>
+
+            <button
+              className="login-choose-btn"
+              onClick={() => selectRole('buyer')}
+            >
+              <span className="login-choose-icon-shape buyer-shape" />
+              <span>Buyer / Member</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <Footer />
+      </div>
+    );
+  }
+
+  /* ═══════════════════════════════════════
+     STEP 2 — Form Login
+  ═══════════════════════════════════════ */
+  const isAdminLogin = loginAs === 'admin';
   return (
     <div className="login-page">
       <div className="login-card">
-        {/* Logo */}
+        {/* Tombol kembali */}
+        <button
+          className="login-back-btn"
+          onClick={() => setStep('choose')}
+        >
+          <Icon name="ChevronLeft" size={16} />
+          Ganti peran
+        </button>
+
+        {/* Header form */}
         <div className="login-logo">
           <div className="login-logo-icon">
-            <ShoppingBag size={28} />
+            {isAdminLogin
+              ? <Icon name="Shield" size={28} />
+              : <Icon name="ShoppingBag" size={28} />
+            }
           </div>
-          <h1>WEB REKAPAN GO</h1>
-          <p>Sistem Manajemen Group Order</p>
+          <h1>{isAdminLogin ? 'Admin / Seller' : 'Buyer / Member'}</h1>
+          <p>
+            {isAdminLogin
+              ? 'Login dengan akun Admin atau Super Admin'
+              : 'Login dengan akun Buyer / Member'}
+          </p>
         </div>
 
-        {/* Role Tabs */}
-        <div className="login-role-tabs">
-          <div
-            className={`role-tab ${role === 'seller' ? 'active' : ''}`}
-            onClick={() => setRole('seller')}
-          >
-            👨‍💼 Seller / Admin
-          </div>
-          <div
-            className={`role-tab ${role === 'buyer' ? 'active' : ''}`}
-            onClick={() => setRole('buyer')}
-          >
-            🛍️ Buyer
-          </div>
+        {/* Badge peran */}
+        <div className={`login-role-badge ${isAdminLogin ? 'admin' : 'buyer'}`}>
+          {isAdminLogin ? '🔐 Area Admin' : '🛍️ Area Buyer'}
         </div>
 
         {/* Form */}
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">
-              {role === 'seller' ? 'Email / Username' : 'Email / Nomor WhatsApp'}
+              {isAdminLogin ? 'Email / Username' : 'Email / Nomor WhatsApp'}
             </label>
             <input
               type="text"
               className="form-control"
-              placeholder={role === 'seller' ? 'admin@example.com' : 'Email atau nomor WA'}
+              placeholder={isAdminLogin ? 'admin@example.com' : 'Email atau nomor WA'}
               value={identifier}
               onChange={e => setIdentifier(e.target.value)}
               autoComplete="username"
+              autoFocus
             />
           </div>
 
@@ -105,39 +190,23 @@ export default function LoginPage() {
                   border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer',
                 }}
               >
-                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPass ? <Icon name="EyeOff" size={16} /> : <Icon name="Eye" size={16} />}
               </button>
             </div>
           </div>
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className={`btn btn-primary login-submit-btn ${isAdminLogin ? '' : 'buyer-btn'}`}
             disabled={loading}
-            style={{ width: '100%', padding: 12, fontSize: 15, marginTop: 8 }}
           >
             {loading ? 'Memproses...' : 'Masuk'}
           </button>
         </form>
-
-        {/* Demo credentials */}
-        <div style={{
-          marginTop: 24, padding: 16, borderRadius: 'var(--radius)',
-          background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.2)',
-        }}>
-          <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.6)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            Demo Credentials
-          </p>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.8 }}>
-            <strong style={{ color: 'rgba(255,255,255,0.9)' }}>Seller:</strong><br />
-            Email: admin@webrekapango.com<br />
-            Password: admin123<br />
-            <br />
-            <strong style={{ color: 'rgba(255,255,255,0.9)' }}>Buyer:</strong><br />
-            Email: siti@example.com / Password: buyer123
-          </div>
-        </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

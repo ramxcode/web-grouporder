@@ -5,7 +5,7 @@ import { StatusBadge, PaymentBadge, ConfirmDialog, SkeletonRows, EmptyState, Pag
 import { formatCurrency, formatDateShort, STATUS_ORDER, WAREHOUSES, PAYMENT_STATUSES } from '../../lib/utils';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Search, Trash2, Edit, Eye, Download, Database } from 'lucide-react';
+import Icon from '../../components/Icon';
 import OrderModal from './components/OrderModal';
 import OrderDetail from './components/OrderDetail';
 
@@ -19,6 +19,8 @@ export default function DataOrder() {
   const [filterPayment, setFilterPayment] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterWarehouse, setFilterWarehouse] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
   const [buyers, setBuyers] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -36,12 +38,14 @@ export default function DataOrder() {
         ...(filterPayment && { paymentStatus: filterPayment }),
         ...(filterStatus && { statusBarang: filterStatus }),
         ...(filterWarehouse && { warehouse: filterWarehouse }),
+        ...(startDate && { startDate }),
+        ...(endDate && { endDate }),
       });
       const res = await api.get(`/orders?${params}`);
       if (res.data.success) { setOrders(res.data.data); setPagination(res.data.pagination); }
     } catch { toast.error('Gagal memuat data order'); }
     finally { setLoading(false); }
-  }, [page, search, filterBuyer, filterPayment, filterStatus, filterWarehouse, sortOrder]);
+  }, [page, search, filterBuyer, filterPayment, filterStatus, filterWarehouse, startDate, endDate, sortOrder]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
   useEffect(() => {
@@ -83,10 +87,10 @@ export default function DataOrder() {
             {pagination && <div className="card-subtitle">{pagination.total} total order</div>}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn btn-secondary btn-sm" onClick={() => handleExport('xlsx')}><Download size={14} /> Excel</button>
-            <button className="btn btn-secondary btn-sm" onClick={() => handleExport('csv')}><Download size={14} /> CSV</button>
+            <button className="btn btn-secondary btn-sm" onClick={() => handleExport('xlsx')}><Icon name="Download" size={14} /> Excel</button>
+            <button className="btn btn-secondary btn-sm" onClick={() => handleExport('csv')}><Icon name="Download" size={14} /> CSV</button>
             <button className="btn btn-primary" onClick={() => { setEditOrder(null); setShowModal(true); }}>
-              <Plus size={15} /> Tambah Order
+              <Icon name="Plus" size={15} /> Tambah Order
             </button>
           </div>
         </div>
@@ -95,7 +99,7 @@ export default function DataOrder() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)' }}>
           <div className="filter-bar" style={{ marginBottom: 0 }}>
             <div className="search-input-wrap">
-              <Search size={15} />
+              <Icon name="Search" size={15} />
               <input type="text" className="search-input" placeholder="Cari order ID, item, buyer, resi..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
             </div>
             <select className="filter-select" value={filterBuyer} onChange={e => { setFilterBuyer(e.target.value); setPage(1); }}>
@@ -114,6 +118,11 @@ export default function DataOrder() {
               <option value="">Semua Warehouse</option>
               {WAREHOUSES.map(w => <option key={w} value={w}>{w}</option>)}
             </select>
+            <input type="date" className="filter-select" value={startDate} onChange={e => { setStartDate(e.target.value); setPage(1); }} title="Dari tanggal" />
+            <input type="date" className="filter-select" value={endDate} onChange={e => { setEndDate(e.target.value); setPage(1); }} title="Sampai tanggal" />
+            <button className="btn btn-secondary btn-sm" onClick={() => setSortOrder(v => v === 'desc' ? 'asc' : 'desc')} title="Toggle sort">
+              {sortOrder === 'desc' ? <Icon name="ChevronDown" size={14} /> : <Icon name="ChevronUp" size={14} />} Tanggal
+            </button>
           </div>
         </div>
 
@@ -143,7 +152,7 @@ export default function DataOrder() {
             <tbody>
               {loading ? <SkeletonRows rows={8} cols={16} /> : orders.length === 0 ? (
                 <tr><td colSpan={16}>
-                  <EmptyState icon={<Database size={32} />} title="Tidak ada data" message="Tambahkan order atau ubah filter" />
+                  <EmptyState icon={<Icon name="Database" size={32} />} title="Tidak ada data" message="Tambahkan order atau ubah filter" />
                 </td></tr>
               ) : orders.map(o => (
                 <tr key={o._id}>
@@ -166,9 +175,9 @@ export default function DataOrder() {
                   <td style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDateShort(o.createdAt)}</td>
                   <td>
                     <div className="table-actions">
-                      <button className="btn btn-ghost btn-icon btn-sm" title="Detail" onClick={() => setDetailOrder(o)}><Eye size={13} /></button>
-                      <button className="btn btn-ghost btn-icon btn-sm" title="Edit" onClick={() => { setEditOrder(o); setShowModal(true); }}><Edit size={13} /></button>
-                      <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} title="Hapus" onClick={() => setDeleteConfirm(o)}><Trash2 size={13} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" title="Detail" onClick={() => setDetailOrder(o)}><Icon name="Eye" size={13} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" title="Edit" onClick={() => { setEditOrder(o); setShowModal(true); }}><Icon name="Edit" size={13} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} title="Hapus" onClick={() => setDeleteConfirm(o)}><Icon name="Trash2" size={13} /></button>
                     </div>
                   </td>
                 </tr>

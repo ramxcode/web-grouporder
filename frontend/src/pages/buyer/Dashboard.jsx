@@ -4,7 +4,7 @@ import { StatCard } from '../../components/UI';
 import { formatCurrency, formatDateShort, getStatusBadgeClass } from '../../lib/utils';
 import api from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
-import { ShoppingBag, CreditCard, Package, CheckCircle, Clock, AlertCircle, Warehouse, Plane } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 export default function BuyerDashboard() {
   const [data, setData] = useState(null);
@@ -54,15 +54,15 @@ export default function BuyerDashboard() {
 
       {/* Stats */}
       <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
-        <StatCard label="Total Order" value={s.totalOrder || 0} icon={<ShoppingBag size={22} />} color="var(--primary)" bg="var(--primary-bg)" />
-        <StatCard label="Order Aktif" value={s.activeOrders || 0} icon={<Clock size={22} />} color="#0ea5e9" bg="#f0f9ff" />
-        <StatCard label="Menunggu Bayar" value={s.menungguPembayaran || 0} icon={<AlertCircle size={22} />} color="#f59e0b" bg="#fef3c7" />
-        <StatCard label="Total Tagihan" value={formatCurrency(s.totalTagihan)} icon={<CreditCard size={22} />} color="#8b5cf6" bg="#f5f3ff" />
-        <StatCard label="Sudah Dibayar" value={formatCurrency(s.sudahDibayar)} icon={<CheckCircle size={22} />} color="#10b981" bg="#d1fae5" />
-        <StatCard label="Sisa Tagihan" value={formatCurrency(s.sisaTagihan)} icon={<AlertCircle size={22} />} color="#ef4444" bg="#fee2e2" />
-        <StatCard label="Di Warehouse" value={s.barangDiWarehouse || 0} icon={<Warehouse size={22} />} color="#14b8a6" bg="#f0fdfa" />
-        <StatCard label="Arrived INA" value={s.barangArrived || 0} icon={<Plane size={22} />} color="#22c55e" bg="#f0fdf4" />
-        <StatCard label="Order Selesai" value={s.orderSelesai || 0} icon={<CheckCircle size={22} />} color="#15803d" bg="#dcfce7" />
+        <StatCard label="Total Order" value={s.totalOrder || 0} icon={<Icon name="ShoppingBag" size={22} />} color="var(--primary)" bg="var(--primary-bg)" />
+        <StatCard label="Order Aktif" value={s.activeOrders || 0} icon={<Icon name="Clock" size={22} />} color="#0ea5e9" bg="#f0f9ff" />
+        <StatCard label="Menunggu Bayar" value={s.menungguPembayaran || 0} icon={<Icon name="AlertCircle" size={22} />} color="#f59e0b" bg="#fef3c7" />
+        <StatCard label="Total Tagihan" value={formatCurrency(s.totalTagihan)} icon={<Icon name="CreditCard" size={22} />} color="#8b5cf6" bg="#f5f3ff" />
+        <StatCard label="Sudah Dibayar" value={formatCurrency(s.sudahDibayar)} icon={<Icon name="CheckCircle" size={22} />} color="#10b981" bg="#d1fae5" />
+        <StatCard label="Sisa Tagihan" value={formatCurrency(s.sisaTagihan)} icon={<Icon name="AlertCircle" size={22} />} color="#ef4444" bg="#fee2e2" />
+        <StatCard label="Di Warehouse" value={s.barangDiWarehouse || 0} icon={<Icon name="Warehouse" size={22} />} color="#14b8a6" bg="#f0fdfa" />
+        <StatCard label="Arrived INA" value={s.barangArrived || 0} icon={<Icon name="Plane" size={22} />} color="#22c55e" bg="#f0fdf4" />
+        <StatCard label="Order Selesai" value={s.orderSelesai || 0} icon={<Icon name="CheckCircle" size={22} />} color="#15803d" bg="#dcfce7" />
       </div>
 
       {/* Recent Orders */}

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const STATUSES = ['Ordered', 'WH KR', 'WH JP', 'WH Taiwan', 'WH Thai', 'WH US', 'Arrived INA', 'Arrived Admin', 'Done CO'];
+const STATUSES = ['Ordered', 'WH KR', 'WH JP', 'WH Taiwan', 'WH Thai', 'WH US', 'Arrived INA', 'Arrived Admin', 'Done CO', 'Packing', 'Shipping INA', 'Selesai'];
 const PAYMENT_STATUSES = ['Unpaid', 'DP', 'Paid'];
 const WAREHOUSES = ['WH KR', 'WH JP', 'WH Taiwan', 'WH Thai', 'WH US', 'Indonesia', 'Custom'];
 

@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { PaymentBadge, ConfirmDialog, SkeletonRows, EmptyState, Pagination } from '../../components/UI';
 import { formatCurrency, formatDate, formatDateShort, PAYMENT_METHODS, PAYMENT_STATUSES } from '../../lib/utils';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Search, Trash2, Edit, CreditCard, X } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 function PaymentModal({ payment, orders, buyers, onClose, onSave }) {
   const isEdit = !!payment;
@@ -77,7 +77,7 @@ function PaymentModal({ payment, orders, buyers, onClose, onSave }) {
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">{isEdit ? 'Edit Pembayaran' : 'Catat Pembayaran'}</h3>
-          <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={18} /></button>
+          <button className="btn btn-ghost btn-icon" onClick={onClose}><Icon name="X" size={18} /></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -229,7 +229,7 @@ export default function SellerPayment() {
         <div className="card-header">
           <div className="card-title">Riwayat Pembayaran</div>
           <button className="btn btn-primary" onClick={() => { setEditPayment(null); setShowModal(true); }}>
-            <Plus size={15} /> Catat Pembayaran
+            <Icon name="Plus" size={15} /> Catat Pembayaran
           </button>
         </div>
 
@@ -261,7 +261,7 @@ export default function SellerPayment() {
             <tbody>
               {loading ? <SkeletonRows rows={8} cols={9} /> : payments.length === 0 ? (
                 <tr><td colSpan={9}>
-                  <EmptyState icon={<CreditCard size={32} />} title="Belum ada pembayaran" message="Catat pembayaran pertama dari buyer" />
+                  <EmptyState icon={<Icon name="CreditCard" size={32} />} title="Belum ada pembayaran" message="Catat pembayaran pertama dari buyer" />
                 </td></tr>
               ) : payments.map(p => (
                 <tr key={p._id}>
@@ -283,10 +283,10 @@ export default function SellerPayment() {
                   <td>
                     <div className="table-actions">
                       <button className="btn btn-ghost btn-icon btn-sm" onClick={() => { setEditPayment(p); setShowModal(true); }} title="Edit">
-                        <Edit size={14} />
+                        <Icon name="Edit" size={14} />
                       </button>
                       <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} onClick={() => setDeleteConfirm(p)} title="Hapus">
-                        <Trash2 size={14} />
+                        <Icon name="Trash2" size={14} />
                       </button>
                     </div>
                   </td>

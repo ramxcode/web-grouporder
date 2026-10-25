@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { EmptyState, Pagination } from '../../components/UI';
 import { formatCurrency, formatDateShort, formatDate } from '../../lib/utils';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { CreditCard, AlertCircle } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 export default function BuyerPayment() {
   const [payments, setPayments] = useState([]);
@@ -92,7 +92,7 @@ export default function BuyerPayment() {
                       display: 'flex', alignItems: 'center', gap: 8, color: 'var(--danger)',
                       fontSize: 12.5, fontWeight: 600, flexShrink: 0,
                     }}>
-                      <AlertCircle size={14} />
+                      <Icon name="AlertCircle" size={14} />
                       Belum Lunas
                     </div>
                   )}
@@ -112,7 +112,7 @@ export default function BuyerPayment() {
         {loading ? (
           <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>Memuat...</div>
         ) : payments.length === 0 ? (
-          <EmptyState icon={<CreditCard size={32} />} title="Belum ada riwayat pembayaran" message="Pembayaran yang dikonfirmasi akan muncul di sini" />
+          <EmptyState icon={<Icon name="CreditCard" size={32} />} title="Belum ada riwayat pembayaran" message="Pembayaran yang dikonfirmasi akan muncul di sini" />
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table className="table">

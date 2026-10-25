@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { StockBadge, EmptyState, Pagination } from '../../components/UI';
 import { formatCurrency, formatDateShort } from '../../lib/utils';
 import api from '../../lib/api';
-import { Package } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 export default function BuyerStok() {
   const [stocks, setStocks] = useState([]);
@@ -35,7 +35,7 @@ export default function BuyerStok() {
         </div>
       ) : stocks.length === 0 ? (
         <div className="card">
-          <EmptyState icon={<Package size={48} />} title="Belum ada barang" message="Barang yang sudah assigned ke Anda akan muncul di sini" />
+          <EmptyState icon={<Icon name="Package" size={48} />} title="Belum ada barang" message="Barang yang sudah assigned ke Anda akan muncul di sini" />
         </div>
       ) : (
         <>
@@ -47,7 +47,7 @@ export default function BuyerStok() {
                   {s.foto ? (
                     <img src={s.foto} alt={s.namaBarang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <Package size={48} style={{ color: 'var(--text-muted)' }} />
+                    <Icon name="Package" size={48} style={{ color: 'var(--text-muted)' }} />
                   )}
                 </div>
 

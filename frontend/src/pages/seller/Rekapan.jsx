@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { StatusBadge, SkeletonRows, EmptyState, Pagination } from '../../components/UI';
 import { formatCurrency, formatDate, formatDateShort, STATUS_ORDER, WAREHOUSES } from '../../lib/utils';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { Search, Download, Filter, TrendingUp } from 'lucide-react';
+import Icon from '../../components/Icon';
 
 export default function Rekapan() {
   const [orders, setOrders] = useState([]);
@@ -94,10 +94,10 @@ export default function Rekapan() {
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn btn-secondary btn-sm" onClick={() => handleExport('xlsx')}>
-              <Download size={14} /> Excel
+              <Icon name="Download" size={14} /> Excel
             </button>
             <button className="btn btn-secondary btn-sm" onClick={() => handleExport('csv')}>
-              <Download size={14} /> CSV
+              <Icon name="Download" size={14} /> CSV
             </button>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function Rekapan() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)' }}>
           <div className="filter-bar" style={{ marginBottom: 0 }}>
             <div className="search-input-wrap">
-              <Search size={15} />
+              <Icon name="Search" size={15} />
               <input type="text" className="search-input" placeholder="Cari order, item, resi..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
             </div>
             <select className="filter-select" value={filterBuyer} onChange={e => { setFilterBuyer(e.target.value); setPage(1); }}>
@@ -146,7 +146,7 @@ export default function Rekapan() {
             <tbody>
               {loading ? <SkeletonRows rows={8} cols={11} /> : orders.length === 0 ? (
                 <tr><td colSpan={11}>
-                  <EmptyState icon={<TrendingUp size={32} />} title="Tidak ada data" message="Coba ubah filter pencarian" />
+                  <EmptyState icon={<Icon name="TrendingUp" size={32} />} title="Tidak ada data" message="Coba ubah filter pencarian" />
                 </td></tr>
               ) : orders.map(o => (
                 <tr key={o._id}>

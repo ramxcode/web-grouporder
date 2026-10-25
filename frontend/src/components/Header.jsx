@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Menu, Bell, Moon, Sun, ChevronDown, LogOut, User, Shield } from 'lucide-react';
+import Icon from './Icon';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 
-export default function Header({ onMenuToggle, title, subtitle }) {
+export default function Header({ onMenuToggle, sidebarOpen, title, subtitle }) {
   const { user, logout, isSeller, isSuperAdmin } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -40,10 +40,10 @@ export default function Header({ onMenuToggle, title, subtitle }) {
   const profilePath = isSuperAdmin ? '/owner/profile' : null;
 
   return (
-    <header className="header">
+    <header className="header" style={{ left: sidebarOpen ? 'var(--sidebar-width)' : '0' }}>
       <div className="header-left">
         <button className="menu-toggle" onClick={onMenuToggle} style={{ display: 'flex' }}>
-          <Menu size={20} />
+          <Icon name="Menu" size={20} />
         </button>
         <div>
           {title && <div className="page-title">{title}</div>}
@@ -53,7 +53,7 @@ export default function Header({ onMenuToggle, title, subtitle }) {
 
       <div className="header-right">
         <button className="header-btn" onClick={toggleTheme} title="Toggle theme">
-          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          {isDark ? <Icon name="Sun" size={16} /> : <Icon name="Moon" size={16} />}
         </button>
 
         <button
@@ -62,7 +62,7 @@ export default function Header({ onMenuToggle, title, subtitle }) {
           title="Notifikasi"
           style={{ position: 'relative' }}
         >
-          <Bell size={16} />
+          <Icon name="Bell" size={16} />
           {unread > 0 && (
             <span className="notif-badge">{unread > 9 ? '9+' : unread}</span>
           )}
@@ -95,9 +95,9 @@ export default function Header({ onMenuToggle, title, subtitle }) {
               {user?.name}
             </span>
             {isSuperAdmin && (
-              <Shield size={12} style={{ color: '#a78bfa', flexShrink: 0 }} />
+              <Icon name="Shield" size={12} style={{ color: '#a78bfa', flexShrink: 0 }} />
             )}
-            <ChevronDown size={14} style={{ color: 'var(--text-muted)' }} />
+            <Icon name="ChevronDown" size={14} style={{ color: 'var(--text-muted)' }} />
           </button>
 
           {showUserMenu && (
@@ -125,7 +125,7 @@ export default function Header({ onMenuToggle, title, subtitle }) {
                       fontSize: 10.5, color: '#a78bfa', fontWeight: 700, marginTop: 4,
                       background: 'rgba(167,139,250,0.12)', padding: '2px 8px', borderRadius: 999,
                     }}>
-                      <Shield size={9} /> Super Admin / Owner
+                      <Icon name="Shield" size={9} /> Super Admin / Owner
                     </div>
                   )}
                 </div>
@@ -138,7 +138,7 @@ export default function Header({ onMenuToggle, title, subtitle }) {
                       background: 'none', border: 'none', cursor: 'pointer',
                     }}
                   >
-                    <User size={14} />
+                    <Icon name="User" size={14} />
                     Profile
                   </button>
                 )}
@@ -150,7 +150,7 @@ export default function Header({ onMenuToggle, title, subtitle }) {
                     background: 'none', border: 'none', cursor: 'pointer',
                   }}
                 >
-                  <LogOut size={14} />
+                  <Icon name="LogOut" size={14} />
                   Keluar
                 </button>
               </div>

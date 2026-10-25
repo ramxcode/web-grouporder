@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency, formatDate, STATUS_ORDER, getStatusBadgeClass, getPaymentBadgeClass } from '../../../lib/utils';
 import { StatusBadge, PaymentBadge } from '../../../components/UI';
-import { X, Edit, Check, Circle, ExternalLink } from 'lucide-react';
+import Icon from '../../../components/Icon';
 import api from '../../../lib/api';
 
 export default function OrderDetail({ order: initialOrder, onClose, onEdit, isSeller = true }) {
@@ -18,9 +18,9 @@ export default function OrderDetail({ order: initialOrder, onClose, onEdit, isSe
   const currentIdx = STATUS_ORDER.indexOf(order?.statusBarang);
 
   const getTimelineIcon = (status, idx) => {
-    if (idx < currentIdx) return <Check size={14} />;
+    if (idx < currentIdx) return <Icon name="Check" size={14} />;
     if (idx === currentIdx) return <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }} />;
-    return <Circle size={12} />;
+    return <Icon name="Circle" size={12} />;
   };
 
   const getHistoryForStatus = (status) => {
@@ -40,10 +40,10 @@ export default function OrderDetail({ order: initialOrder, onClose, onEdit, isSe
           <div style={{ display: 'flex', gap: 8 }}>
             {onEdit && (
               <button className="btn btn-secondary btn-sm" onClick={onEdit}>
-                <Edit size={14} /> Edit
+                <Icon name="Edit" size={14} /> Edit
               </button>
             )}
-            <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={18} /></button>
+            <button className="btn btn-ghost btn-icon" onClick={onClose}><Icon name="X" size={18} /></button>
           </div>
         </div>
 

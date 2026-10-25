@@ -4,7 +4,7 @@ import { StatusBadge, PaymentBadge, EmptyState, Pagination } from '../../compone
 import { formatCurrency, formatDateShort, STATUS_ORDER, getStatusBadgeClass } from '../../lib/utils';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { ShoppingBag, Search, Eye, Check, Circle } from 'lucide-react';
+import Icon from '../../components/Icon';
 import OrderDetail from '../seller/components/OrderDetail';
 
 export default function BuyerStatusOrder() {
@@ -33,36 +33,104 @@ export default function BuyerStatusOrder() {
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  // Mini timeline for each order card
-  const MiniTimeline = ({ statusBarang }) => {
+  // Full tracking timeline for each order card
+  const MiniTimeline = ({ statusBarang, warehouse }) => {
+    const whLabel = warehouse || 'WH';
     const currentIdx = STATUS_ORDER.indexOf(statusBarang);
-    // Show only up to 5 key statuses
-    const keyStatuses = ['Ordered', 'WH KR', 'Arrived INA', 'Arrived Admin', 'Done CO'];
+
+    // Index references
+    const idx = {
+      ordered:      STATUS_ORDER.indexOf('Ordered'),
+      whMin:        Math.min(...['WH KR','WH JP','WH Taiwan','WH Thai','WH US'].map(s => STATUS_ORDER.indexOf(s))),
+      arrivedIna:   STATUS_ORDER.indexOf('Arrived INA'),
+      arrivedAdmin: STATUS_ORDER.indexOf('Arrived Admin'),
+      doneCO:       STATUS_ORDER.indexOf('Done CO'),
+      packing:      STATUS_ORDER.indexOf('Packing'),
+      shippingIna:  STATUS_ORDER.indexOf('Shipping INA'),
+      selesai:      STATUS_ORDER.indexOf('Selesai'),
+    };
+
+    // Each step: { label, done, current }
+    const steps = [
+      {
+        label: 'ORDER',
+        done: currentIdx >= idx.ordered,
+        current: statusBarang === 'Ordered',
+      },
+      {
+        label: whLabel,
+        done: currentIdx >= idx.whMin,
+        current: ['WH KR','WH JP','WH Taiwan','WH Thai','WH US'].includes(statusBarang),
+      },
+      {
+        label: 'SHIPPING',
+        done: currentIdx > idx.whMin,
+        current: false, // virtual step
+      },
+      {
+        label: 'ARRIVED INA',
+        done: currentIdx >= idx.arrivedIna,
+        current: statusBarang === 'Arrived INA',
+      },
+      {
+        label: 'BEA CUKAI',
+        done: currentIdx > idx.arrivedIna,
+        current: false, // virtual step
+      },
+      {
+        label: 'ARRIVED WH ADMIN',
+        done: currentIdx >= idx.arrivedAdmin,
+        current: statusBarang === 'Arrived Admin',
+      },
+      {
+        label: 'DONE CO',
+        done: currentIdx >= idx.doneCO,
+        current: statusBarang === 'Done CO',
+      },
+      {
+        label: 'PACKING',
+        done: currentIdx >= idx.packing,
+        current: statusBarang === 'Packing',
+      },
+      {
+        label: 'SHIPPING',
+        done: currentIdx >= idx.shippingIna,
+        current: statusBarang === 'Shipping INA',
+      },
+      {
+        label: 'PESANAN SELESAI',
+        done: currentIdx >= idx.selesai,
+        current: statusBarang === 'Selesai',
+      },
+    ];
+
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginTop: 8 }}>
-        {keyStatuses.map((s, i) => {
-          const sIdx = STATUS_ORDER.indexOf(s);
-          const isDone = sIdx <= currentIdx;
-          const isCurrent = s === statusBarang || (currentIdx >= STATUS_ORDER.indexOf('WH KR') && currentIdx <= STATUS_ORDER.indexOf('WH US') && s === 'WH KR');
-          return (
-            <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 4,
-                padding: '3px 8px', borderRadius: 'var(--radius-full)',
-                background: isDone ? 'var(--success-light)' : 'var(--bg)',
-                border: `1px solid ${isDone ? 'var(--success)' : 'var(--border)'}`,
-                fontSize: 11, fontWeight: 600,
-                color: isDone ? 'var(--success-dark)' : 'var(--text-muted)',
-              }}>
-                {isDone ? <Check size={10} /> : <Circle size={10} />}
-                {s}
-              </div>
-              {i < keyStatuses.length - 1 && (
-                <div style={{ width: 16, height: 2, background: isDone && i < currentIdx ? 'var(--success)' : 'var(--border)', borderRadius: 2 }} />
-              )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', marginTop: 10 }}>
+        {steps.map((step, i) => (
+          <div key={`${step.label}-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 3,
+              padding: '3px 7px', borderRadius: 'var(--radius-full)',
+              background: step.done ? (step.current ? 'var(--primary)' : 'var(--success-light)') : 'var(--bg)',
+              border: `1px solid ${step.done ? (step.current ? 'var(--primary)' : 'var(--success)') : 'var(--border)'}`,
+              fontSize: 10, fontWeight: 700,
+              color: step.done ? (step.current ? '#fff' : 'var(--success-dark)') : 'var(--text-muted)',
+              whiteSpace: 'nowrap',
+              boxShadow: step.current ? '0 2px 8px rgba(99,102,241,0.3)' : 'none',
+              transition: 'all 0.2s',
+            }}>
+              {step.done ? <Icon name="Check" size={8} /> : <Icon name="Circle" size={8} />}
+              {step.label}
             </div>
-          );
-        })}
+            {i < steps.length - 1 && (
+              <div style={{
+                width: 10, height: 2,
+                background: steps[i + 1]?.done ? 'var(--success)' : 'var(--border)',
+                borderRadius: 2, flexShrink: 0,
+              }} />
+            )}
+          </div>
+        ))}
       </div>
     );
   };
@@ -72,7 +140,7 @@ export default function BuyerStatusOrder() {
       {/* Filters */}
       <div className="filter-bar" style={{ marginBottom: 16 }}>
         <div className="search-input-wrap">
-          <Search size={15} />
+          <Icon name="Search" size={15} />
           <input type="text" className="search-input" placeholder="Cari order, nama barang..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
         </div>
         <select className="filter-select" value={filterPayment} onChange={e => { setFilterPayment(e.target.value); setPage(1); }}>
@@ -98,7 +166,7 @@ export default function BuyerStatusOrder() {
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <EmptyState icon={<ShoppingBag size={32} />} title="Belum ada pesanan" message="Pesanan Anda akan muncul di sini" />
+        <EmptyState icon={<Icon name="ShoppingBag" size={32} />} title="Belum ada pesanan" message="Pesanan Anda akan muncul di sini" />
       ) : (
         <div style={{ display: 'grid', gap: 16 }}>
           {orders.map(o => (
@@ -138,14 +206,14 @@ export default function BuyerStatusOrder() {
                     )}
                   </div>
 
-                  {/* Mini Timeline */}
-                  <MiniTimeline statusBarang={o.statusBarang} />
+                  {/* Tracking Timeline */}
+                  <MiniTimeline statusBarang={o.statusBarang} warehouse={o.warehouse} />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
                   <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{formatDateShort(o.createdAt)}</span>
                   <button className="btn btn-secondary btn-sm" onClick={() => setDetailOrder(o)}>
-                    <Eye size={13} /> Detail
+                    <Icon name="Eye" size={13} /> Detail
                   </button>
                 </div>
               </div>
